@@ -2,31 +2,52 @@ import random
 
 # TODO
 # Pas le droit de dépasser la cible
-# Sortir à 650
 # Strikes
-# 2 joueurs
 # Affichage
 # Passer à 10 000
 
-score = 0
+scores = []
 dice = []
 state = []
+players = []
+nb_players = 0
+current_player = -1
+
+
+def register_players():
+    global players
+    global nb_players
+    global scores
+
+    nb_players = ""
+    while(not isinstance(nb_players, int) or nb_players < 1 or nb_players > 10):
+        try:
+            nb_players = int(input("Combien êtes-vous ? "))
+        except:
+            print("Veuillez entrer un nombre entier, entre 1 et 10.")
+    
+    scores = [0 for i in range(nb_players)]
+    players = ["" for i in range(nb_players)]
+    
+    for i in range(nb_players):
+        players[i] = input("j" + str(i) + ", comment t'appelles-tu ? ")
 
 
 
 def check_quinte():
-    global score
+    global scores
     global dice
     global state
+    global current_player
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
         if(dice.count(dice[0]) == 5): # Est-ce qu'on a le même chiffre 5 fois
             state = [1 for i in range (5)] # Tous les dés ont été utilisés
             if(dice[0] == 1):
-                score += 4000
+                scores[current_player] += 4000
             else:
-                score += dice[0] * 400
-            print("Une quinte ! Ton score est maintenant de", score)
+                scores[current_player] += dice[0] * 400
+            print("Une quinte ! Ton score est maintenant de", scores[current_player])
             return 1
         else:
             print("Pas de quinte :(")
@@ -38,7 +59,7 @@ def check_quinte():
 
 
 def check_suite():
-    global score
+    global scores
     global dice
     global state
 
@@ -51,8 +72,8 @@ def check_suite():
                 
         if(ok):
             state = [1 for i in range (5)] # Tous les dés ont été utilisés
-            score += 1500
-            print("Une suite ! Ton score est maintenant de", score)
+            scores[current_player] += 1500
+            print("Une suite ! Ton score est maintenant de", scores[current_player])
             return 1
         else:
             print("Pas de suite :(")
@@ -63,23 +84,29 @@ def check_suite():
 
 
 def check_full():
-    global score
+    global scores
     global dice
     global state
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
-        current_score = score
+        current_score = scores[current_player]
+        nope = 0
 
         if(check_brelan(False)):
             others = [x for i, x in enumerate(dice) if state[i] == 0]
             if(others.count(others[0]) == 2):
                 state = [1 for i in range(5)]
-                score = current_score
-                score += 1500
-                print("Un full ! Ton score est maintenant de", score)
+                scores[current_player] = current_score
+                scores[current_player] += 1500
+                print("Un full ! Ton score est maintenant de", scores[current_player])
                 return 1
+            else:
+                nope = 1
         else:
-            score = current_score
+            nope = 1
+        
+        if(nope):
+            scores[current_player] = current_score
             state = [0 for i in range (5)]
             print("Pas de full :(")
             return 0
@@ -90,7 +117,7 @@ def check_full():
 
 
 def check_carre():
-    global score
+    global scores
     global dice
     global state
 
@@ -99,20 +126,20 @@ def check_carre():
         if(dice.count(dice[0]) == 4 and state[:-1].count(0) == 4): # Les 4 premiers dés
             state[:-1] = [1 for i in range(4)]
             if(dice[0] == 1):
-                score += 2000
+                scores[current_player] += 2000
             else:
-                score += dice[0] * 200
-            print("Un carré ! Ton score est maintenant de", score)
+                scores[current_player] += dice[0] * 200
+            print("Un carré ! Ton score est maintenant de", scores[current_player])
             return 1
 
         elif(dice.count(dice[1]) == 4 and state[1:].count(0) == 4): # Les 4 derniers dés
             state[1:] = [1 for i in range(4)]
             state = [1 for i in range (5)] # Tous les dés ont été utilisés
             if(dice[0] == 1):
-                score += 2000
+                scores[current_player] += 2000
             else:
-                score += dice[0] * 200
-            print("Un carré ! Ton score est maintenant de", score)
+                scores[current_player] += dice[0] * 200
+            print("Un carré ! Ton score est maintenant de", scores[current_player])
             return 1
 
         else:
@@ -125,7 +152,7 @@ def check_carre():
 
 
 def check_brelan(message):
-    global score
+    global scores
     global dice
     global state
 
@@ -134,34 +161,34 @@ def check_brelan(message):
         if(dice.count(dice[0]) == 3 and state[0:3].count(0) == 3):
             state[0:3] = [1 for i in range(3)]
             if(dice[0] == 1):
-                score += 1000
+                scores[current_player] += 1000
             else:
-                score += dice[0] * 100
+                scores[current_player] += dice[0] * 100
             
             if(message):
-                print("Un brelan ! Ton score est maintenant de", score)
+                print("Un brelan ! Ton score est maintenant de", scores[current_player])
             return 1
 
         elif(dice.count(dice[1]) == 3 and state[1:4].count(0) == 3):
             state[1:4] = [1 for i in range(3)]
             if(dice[1] == 1):
-                score += 1000
+                scores[current_player] += 1000
             else:
-                score += dice[1] * 100
+                scores[current_player] += dice[1] * 100
 
             if(message):
-                print("Un brelan ! Ton score est maintenant de", score)
+                print("Un brelan ! Ton score est maintenant de", scores[current_player])
             return 1
         
         elif(dice.count(dice[2]) == 3 and state[2:5].count(0) == 3):
             state[2:5] = [1 for i in range(3)]
             if(dice[2] == 1):
-                score += 1000
+                scores[current_player] += 1000
             else:
-                score += dice[2] * 100
+                scores[current_player] += dice[2] * 100
 
             if(message):
-                print("Un brelan ! Ton score est maintenant de", score)
+                print("Un brelan ! Ton score est maintenant de", scores[current_player])
             return 1
 
         else:
@@ -174,7 +201,7 @@ def check_brelan(message):
 
 
 def check_unique():
-    global score
+    global scores
     global dice
     global state
 
@@ -202,8 +229,8 @@ def check_unique():
                             break
         
         if(score_temp != 0):
-            score += score_temp
-            print("Ton score est maintenant de", score)
+            scores[current_player] += score_temp
+            print("Ton score est maintenant de", scores[current_player])
             return 1
         else:
             print("Pas de 1 ou de 5 :(")
@@ -216,17 +243,23 @@ def check_unique():
 
 
 def main():
-    global score
+    global scores
     global dice
     global state
+    global nb_players
+    global current_player
+    global players
 
-    while(score < 1000):
+    register_players()
+
+    while(scores[current_player] < 1000):
         keep_going = 1
         state = [0, 0, 0, 0, 0]
-        current_score = score
+        current_player = (current_player + 1)%3
+        current_score = scores[current_player]
 
         while(keep_going):
-            _ = input("Lance !")
+            _ = input(players[current_player] + " c'est ton tour, lance !")
             unsorted_dice = [(random.randrange(6) + 1) for i in range(5)]
             print("*roule roule roule...*\n")
 
@@ -245,18 +278,18 @@ def main():
             res += check_unique()
 
             if(not res):
-                print("Aïe aïe aïe... Tu n'as rien obtenu. Ton score revient à", current_score)
+                print("Aïe aïe aïe... Tu n'as rien obtenu. Ton score revient à", current_score, "\n")
                 keep_going = 0
-                score = current_score
+                scores[current_player] = current_score
             else:
                 if(state.count(0) == 0):
                     state = [0 for i in range(5)]
 
                 sentence = "\nIl te reste " + str(state.count(0)) + " dé(s)."
                 
-                if(score%100 != 0):
+                if(scores[current_player]%100 != 0):
                     print("\nTon score finit par 50, tu ne peux pas t'arrêter. " + sentence + "\n")
-                elif(score < 600):
+                elif(scores[current_player] < 600):
                     print("Tu as moins de 600, tu n'as pas le droit de t'arrêter. " + sentence + "\n")
                 else:
                     keep_going = input(sentence + " Continuer ? (0 pour non, 1 pour oui) : ")
@@ -264,7 +297,7 @@ def main():
                     if(keep_going == "1"):
                         print("Ok, on continue !\n")
                     else:
-                        print("Ok ! Tour suivant, on recommence avec 5 dés.\n")
+                        print("Ok ! Tour suivant.\n")
                         keep_going = 0
     
     print("Bravo ! Tu as atteint 1000 !")
