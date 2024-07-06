@@ -5,13 +5,14 @@ import random
 # Strikes
 # Affichage
 # Passer à 10 000
+# Si on a main pleine ?
 
 scores = []
 dice = []
 state = []
 players = []
 nb_players = 0
-current_player = -1
+current_player = 0
 
 
 def register_players():
@@ -40,6 +41,8 @@ def check_quinte():
     global state
     global current_player
 
+    print("Check quinte avec : ", state)
+
     if(state.count(0) > 4): # Check qu'il y a assez de dés
         if(dice.count(dice[0]) == 5): # Est-ce qu'on a le même chiffre 5 fois
             state = [1 for i in range (5)] # Tous les dés ont été utilisés
@@ -62,6 +65,9 @@ def check_suite():
     global scores
     global dice
     global state
+    global current_player
+
+    print("Check suite avec : ", state)
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
 
@@ -87,6 +93,9 @@ def check_full():
     global scores
     global dice
     global state
+    global current_player
+
+    print("Check full avec : ", state)
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
         current_score = scores[current_player]
@@ -120,10 +129,13 @@ def check_carre():
     global scores
     global dice
     global state
+    global current_player
+
+    print("Check carré avec : ", state)
 
     if(state.count(0) > 3): # Check s'il y a encore au moins 4 dés
     
-        if(dice.count(dice[0]) == 4 and state[:-1].count(0) == 4): # Les 4 premiers dés
+        if(dice[:-1].count(dice[0]) == 4 and state[:-1].count(0) == 4): # Les 4 premiers dés
             state[:-1] = [1 for i in range(4)]
             if(dice[0] == 1):
                 scores[current_player] += 2000
@@ -132,10 +144,9 @@ def check_carre():
             print("Un carré ! Ton score est maintenant de", scores[current_player])
             return 1
 
-        elif(dice.count(dice[1]) == 4 and state[1:].count(0) == 4): # Les 4 derniers dés
+        elif(dice[1:].count(dice[1]) == 4 and state[1:].count(0) == 4): # Les 4 derniers dés
             state[1:] = [1 for i in range(4)]
-            state = [1 for i in range (5)] # Tous les dés ont été utilisés
-            if(dice[0] == 1):
+            if(dice[1] == 1):
                 scores[current_player] += 2000
             else:
                 scores[current_player] += dice[0] * 200
@@ -155,10 +166,13 @@ def check_brelan(message):
     global scores
     global dice
     global state
+    global current_player
+
+    print("Check brelan avec : ", state)
 
     if(state.count(0) > 2): # Check s'il y a encore au moins 3 dés
 
-        if(dice.count(dice[0]) == 3 and state[0:3].count(0) == 3):
+        if(dice[0:3].count(dice[0]) == 3 and state[0:3].count(0) == 3):
             state[0:3] = [1 for i in range(3)]
             if(dice[0] == 1):
                 scores[current_player] += 1000
@@ -169,7 +183,7 @@ def check_brelan(message):
                 print("Un brelan ! Ton score est maintenant de", scores[current_player])
             return 1
 
-        elif(dice.count(dice[1]) == 3 and state[1:4].count(0) == 3):
+        elif(dice[1:4].count(dice[1]) == 3 and state[1:4].count(0) == 3):
             state[1:4] = [1 for i in range(3)]
             if(dice[1] == 1):
                 scores[current_player] += 1000
@@ -180,7 +194,7 @@ def check_brelan(message):
                 print("Un brelan ! Ton score est maintenant de", scores[current_player])
             return 1
         
-        elif(dice.count(dice[2]) == 3 and state[2:5].count(0) == 3):
+        elif(dice[2:5].count(dice[2]) == 3 and state[2:5].count(0) == 3):
             state[2:5] = [1 for i in range(3)]
             if(dice[2] == 1):
                 scores[current_player] += 1000
@@ -204,6 +218,9 @@ def check_unique():
     global scores
     global dice
     global state
+    global current_player
+
+    print("Check unique avec : ", state)
 
     if(state.count(0) > 0): # Check s'il y a encore au moins 1 dé
         score_temp = 0
@@ -251,11 +268,12 @@ def main():
     global players
 
     register_players()
+    current_player = nb_players-1
 
     while(scores[current_player] < 1000):
         keep_going = 1
         state = [0, 0, 0, 0, 0]
-        current_player = (current_player + 1)%3
+        current_player = (current_player + 1)%nb_players
         current_score = scores[current_player]
 
         while(keep_going):
