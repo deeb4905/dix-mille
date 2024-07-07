@@ -1,0 +1,16 @@
+    Si tu échoue à faire un score (aucun dé ne te donne de points) mais que ce n'est pas ton premier lancer de la manche -> petite barre et ton score ce tour ci est nul
+    SAUF
+
+Si tu viens de descendre d'un palier -> grosse barre
+
+    Si tu fais un R d'un coup -> grosse barre
+
+    3 petites barres -> grosse barre
+
+    Grosse barre -> tu retourne a ton palier précédent
+
+    3 grosse barre de suite -> tous les scores d'avant sont rayés
+
+Si tu as le même score que quelqu'un -> grosse barre pour la personne qui avais le score
+
+R au début -> changer le nom
