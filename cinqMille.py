@@ -1,11 +1,9 @@
 import random
 
 # TODO
-# Pas le droit de dépasser la cible
 # Strikes
 # Affichage
 # Passer à 10 000
-# Si on a main pleine ?
 
 scores = []
 dice = []
@@ -41,8 +39,6 @@ def check_quinte():
     global state
     global current_player
 
-    print("Check quinte avec : ", state)
-
     if(state.count(0) > 4): # Check qu'il y a assez de dés
         if(dice.count(dice[0]) == 5): # Est-ce qu'on a le même chiffre 5 fois
             state = [1 for i in range (5)] # Tous les dés ont été utilisés
@@ -66,8 +62,6 @@ def check_suite():
     global dice
     global state
     global current_player
-
-    print("Check suite avec : ", state)
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
 
@@ -94,8 +88,6 @@ def check_full():
     global dice
     global state
     global current_player
-
-    print("Check full avec : ", state)
 
     if(state.count(0) > 4): # Check qu'il y a assez de dés
         current_score = scores[current_player]
@@ -131,8 +123,6 @@ def check_carre():
     global state
     global current_player
 
-    print("Check carré avec : ", state)
-
     if(state.count(0) > 3): # Check s'il y a encore au moins 4 dés
     
         if(dice[:-1].count(dice[0]) == 4 and state[:-1].count(0) == 4): # Les 4 premiers dés
@@ -167,8 +157,6 @@ def check_brelan(message):
     global dice
     global state
     global current_player
-
-    print("Check brelan avec : ", state)
 
     if(state.count(0) > 2): # Check s'il y a encore au moins 3 dés
 
@@ -219,8 +207,6 @@ def check_unique():
     global dice
     global state
     global current_player
-
-    print("Check unique avec : ", state)
 
     if(state.count(0) > 0): # Check s'il y a encore au moins 1 dé
         score_temp = 0
@@ -297,6 +283,10 @@ def main():
 
             if(not res):
                 print("Aïe aïe aïe... Tu n'as rien obtenu. Ton score revient à", current_score, "\n")
+                keep_going = 0
+                scores[current_player] = current_score
+            elif(scores[current_player] > 1000):
+                print("Oh non, ton score est trop élevé ! Ton score revient à",current_score, '\n')
                 keep_going = 0
                 scores[current_player] = current_score
             else:
