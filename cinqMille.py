@@ -308,7 +308,9 @@ def main():
                 if(scores[current_player]%100 != 0):
                     print("\nTon score finit par 50, tu ne peux pas t'arrêter. " + sentence + "\n")
                 elif(scores[current_player] < 600):
-                    print("Tu as moins de 600, tu n'as pas le droit de t'arrêter. " + sentence + "\n")
+                    print("Tu as moins de 600, tu ne peux pas t'arrêter. " + sentence + "\n")
+                elif(state.count(0) == 5):
+                    print(sentence + " C'est une main pleine, tu ne peux pas t'arrêter.\n")
                 else:
                     keep_going = input(sentence + " Continuer ? (0 pour non, 1 pour oui) : ")
                 
