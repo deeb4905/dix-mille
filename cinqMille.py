@@ -13,6 +13,7 @@ state = []
 players = []
 nb_players = 0
 current_player = 0
+just_fell = 0
 
 
 def register_players():
@@ -37,6 +38,12 @@ def register_players():
 
 
 def check_strikes(first_throw):
+    global scores
+    global small_strikes
+    global big_strikes
+    global current_player
+    global just_fell
+
     if(len(scores[current_player]) != 1):
         small_strikes[current_player][-1] += 1
 
@@ -52,12 +59,19 @@ def check_strikes(first_throw):
                 print("Oh non ! C'est ta troisième grande barre ! Ce sont les règles, tu retombes à 0.\n")
                 scores[current_player] = [0]
                 small_strikes[current_player] = [0]
+            elif(just_fell):
+                print("Oh non ! Tu venais déjà de tomber, et maintenant tu retombes à 0.\n")
+                scores[current_player] = [0]
+                small_strikes[current_player] = [0]
             else:
                 del scores[current_player][-1]
                 del small_strikes[current_player][-1]
+                just_fell = 1
                 print("Ton score revient à", scores[current_player][-1], "\n")
         else:
             print("Aïe aïe aïe... Tu n'as rien obtenu. Tu gagnes une petite barre et ton score revient à", scores[current_player][-1])
+    else:
+        players[current_player] = input("Rien du 1er coup, alors que tu as 0 ? C'est pas de chance ! Tes camarades peuvent choisir un nouveau nom pour toi : ")
 
 
 
@@ -282,6 +296,7 @@ def main():
     global nb_players
     global current_player
     global players
+    global just_fell
 
     register_players()
     current_player = nb_players-1
@@ -335,6 +350,7 @@ def main():
                 elif(state.count(0) == 5):
                     print(sentence + " C'est une main pleine, tu ne peux pas t'arrêter.\n")
                 else:
+                    just_fell = 0
                     keep_going = input(sentence + " Continuer ? (0 pour non, 1 pour oui) : ")
                 
                     if(keep_going == "1"):
