@@ -1,10 +1,5 @@
 import random
 
-# TODO
-# Coup de poing
-# Affichage du score (quand est-ce qu'on affiche les grandes barres, quand est-ce qu'on supprime tout ?)
-# Passer à 10 000
-
 scores = []
 current_score_position = []
 small_strikes = []
@@ -16,6 +11,7 @@ nb_players = 0
 current_player = 0
 current_score = 0
 just_fell = []
+punch = []
 
 
 def register_players():
@@ -26,6 +22,7 @@ def register_players():
     global players
     global nb_players
     global just_fell
+    global punch
 
     nb_players = ""
     while(not isinstance(nb_players, int) or nb_players < 1 or nb_players > 10):
@@ -40,6 +37,7 @@ def register_players():
     big_strikes = [[0] for i in range(nb_players)]
     players = ["" for i in range(nb_players)]
     just_fell = [0 for i in range(nb_players)]
+    punch = [1 for i in range(nb_players)]
     
     for i in range(nb_players):
         players[i] = input("j" + str(i) + ", comment t'appelles-tu ? ")
@@ -411,11 +409,9 @@ def main():
     global current_player
     global players
     global just_fell
+    global punch
 
     register_players()
-
-    print(just_fell)
-    print(players)
 
     end_game = 0
     res = 1
@@ -460,9 +456,20 @@ def main():
             res += check_unique()
 
             if(not res or current_score > 4999):
-                pick_up_score = 0
-                keep_going = 0
-                check_strikes(first_throw)
+                if(punch[current_player]):
+                    use_punch = input("Aucun point ! Veux-tu utiliser ton coup de poing ? (0 pour non, 1 pour oui) : ")
+                    if(use_punch):
+                        print("*BANG*\n")
+                        punch[current_player] = 0
+                    else:
+                        pick_up_score = 0
+                        keep_going = 0
+                        check_strikes(first_throw)
+                else:
+                    pick_up_score = 0
+                    keep_going = 0
+                    check_strikes(first_throw)
+
             else:
                 if(state.count(0) == 0):
                     state = [0 for i in range(5)]
