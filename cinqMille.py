@@ -1,8 +1,6 @@
 import random
 
 # TODO
-# Strikes
-# Reprise de score
 # Coup de poing
 # Affichage du score (quand est-ce qu'on affiche les grandes barres, quand est-ce qu'on supprime tout ?)
 # Passer à 10 000
@@ -17,7 +15,7 @@ players = []
 nb_players = 0
 current_player = 0
 current_score = 0
-just_fell = 0
+just_fell = []
 
 
 def register_players():
@@ -27,6 +25,7 @@ def register_players():
     global big_strikes
     global players
     global nb_players
+    global just_fell
 
     nb_players = ""
     while(not isinstance(nb_players, int) or nb_players < 1 or nb_players > 10):
@@ -40,6 +39,7 @@ def register_players():
     small_strikes = [[0] for i in range(nb_players)]
     big_strikes = [[0] for i in range(nb_players)]
     players = ["" for i in range(nb_players)]
+    just_fell = [0 for i in range(nb_players)]
     
     for i in range(nb_players):
         players[i] = input("j" + str(i) + ", comment t'appelles-tu ? ")
@@ -72,31 +72,31 @@ def display_scores():
 
 def check_duplicates():
     global scores
+    global current_score
     global players
     global current_player
     global current_score_position
     global small_strikes
     global big_strikes
 
-    new_score = scores[current_player][current_score_position[current_player]]
+    for player in range(len(players)):
+        if player != current_player:
+            for i in range(len(scores[player])):
+                if(scores[player][i] == current_score and big_strikes[player][i] == 0):
+                    print("Mais... " + players[player] + " avait déjà eu ce score ! Désolé " + players[player] + ", tu gagnes une grande barre.")
 
-    for player in players:
-        for i in range(len(scores[player])):
-            if(scores[player][i] == new_score and big_strikes[player][i] == 0):
-                print("Mais... " + player + " avait déjà eu ce score ! Désolé " + player + ", tu gagnes une grande barre.")
+                    actual_current_player = current_player
+                    actual_current_score_position = current_score_position
 
-                actual_current_player = current_player
-                actual_current_score_position = current_score_position
+                    current_player = player
+                    current_score_position = i
 
-                current_player = player
-                current_score_position = i
+                    remove_score()
 
-                remove_score()
+                    current_player = actual_current_player
+                    current_score_position = actual_current_score_position
 
-                current_player = actual_current_player
-                current_score_position = actual_current_score_position
-
-                break
+                    break
 
 
 def check_big_strikes():
@@ -122,10 +122,10 @@ def check_strikes(first_throw):
     if(current_score_position[current_player] != 0):
         small_strikes[current_player][current_score_position[current_player]] += 1
 
-        if(small_strikes[current_player][current_score_position[current_player]] == 3 or first_throw or just_fell or current_score - scores[current_player][current_score_position[current_player]] > 1999):
+        if(small_strikes[current_player][current_score_position[current_player]] == 3 or first_throw or just_fell[current_player] or current_score - scores[current_player][current_score_position[current_player]] > 1999):
             if(first_throw):
                 print("Rien du 1er coup ! Tu gagnes une grande barre.\n")
-            elif(just_fell):
+            elif(just_fell[current_player]):
                 print("Oh non ! Tu venais déjà de tomber, tu gagnes une grande barre.\n")
             elif(current_score - scores[current_player][current_score_position[current_player]] > 1999):
                 print("Oh non ! Tu as échoué au dessus de 2000 points, tu gagnes une grande barre.\n")
@@ -143,7 +143,7 @@ def check_strikes(first_throw):
                 
             else:
                 remove_score()
-                just_fell = 1
+                just_fell[current_player] = 1
                 print("Ton score revient à", scores[current_player][current_score_position[current_player]], "\n")
         else:
             print("Aïe aïe aïe... Tu n'as rien obtenu. Tu gagnes une petite barre et ton score revient à", scores[current_player][current_score_position[current_player]])
@@ -295,7 +295,7 @@ def check_carre():
             if(dice[1] == 1):
                 current_score += 2000
             else:
-                current_score += dice[0] * 200
+                current_score += dice[1] * 200
             print("Un carré ! Ton score est maintenant de", current_score)
             return 1
 
@@ -414,15 +414,29 @@ def main():
 
     register_players()
 
+    print(just_fell)
+    print(players)
+
     end_game = 0
+    res = 1
     current_player = nb_players-1
+    pick_up_score = 0
 
     while(not end_game):
         keep_going = 1
-        state = [0, 0, 0, 0, 0]
-        current_player = (current_player + 1)%nb_players
-        current_score = scores[current_player][current_score_position[current_player]]
         first_throw = 1
+        current_player = (current_player + 1)%nb_players
+
+        if(pick_up_score != 0):
+            pick_up = input(players[current_player] + ", veux tu récupérer " + str(pick_up_score) + " avec " + str(state.count(0)) + " dé(s) ? (0 pour non, 1 pour oui) : ")
+            if(pick_up):
+                current_score = scores[current_player][current_score_position[current_player]] + pick_up_score
+            else:
+                state = [0, 0, 0, 0, 0]
+                current_score = scores[current_player][current_score_position[current_player]]
+        else:
+            state = [0, 0, 0, 0, 0]
+            current_score = scores[current_player][current_score_position[current_player]]
 
         display_scores()
 
@@ -446,6 +460,7 @@ def main():
             res += check_unique()
 
             if(not res or current_score > 4999):
+                pick_up_score = 0
                 keep_going = 0
                 check_strikes(first_throw)
             else:
@@ -461,13 +476,14 @@ def main():
                 elif(state.count(0) == 5):
                     print(sentence + " C'est une main pleine, tu ne peux pas t'arrêter.\n")
                 else:
-                    just_fell = 0
+                    just_fell[current_player] = 0
                     keep_going = input(sentence + " Continuer ? (0 pour non, 1 pour oui) : ")
                 
                     if(keep_going == "1"):
                         print("Ok, on continue !\n")
                     else:
                         print("Ok ! Tour suivant.\n")
+                        pick_up_score = current_score - scores[current_player][current_score_position[current_player]]
                         insert_score()
                         check_duplicates()
                         keep_going = 0
