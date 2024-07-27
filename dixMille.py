@@ -425,7 +425,7 @@ def main():
 
         if(pick_up_score != 0):
             pick_up = input(players[current_player] + ", veux tu récupérer " + str(pick_up_score) + " avec " + str(state.count(0)) + " dé(s) ? (0 pour non, 1 pour oui) : ")
-            if(pick_up):
+            if(pick_up == "1"):
                 current_score = scores[current_player][current_score_position[current_player]] + pick_up_score
             else:
                 state = [0, 0, 0, 0, 0]
@@ -458,7 +458,7 @@ def main():
             if(not res or current_score > 4999):
                 if(punch[current_player]):
                     use_punch = input("Aucun point ! Veux-tu utiliser ton coup de poing ? (0 pour non, 1 pour oui) : ")
-                    if(use_punch):
+                    if(use_punch == "1"):
                         print("*BANG*\n")
                         punch[current_player] = 0
                     else:
